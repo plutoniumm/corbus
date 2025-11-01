@@ -4,19 +4,22 @@
   import Card from "./card.svelte";
   import Form from "./form.svelte";
 
+  import { fmt } from "./utils";
+
   let items = [];
   let time = new Date();
-  let timer;
+
   let show = false;
+  let max = false;
+
+  let timer;
 
   onMount(() => {
-    const stored = localStorage.getItem("items");
-    if (stored) {
-      items = JSON.parse(stored);
-    }
+    try {
+      items = JSON.parse(localStorage.getItem("items"));
+    } catch (e) {}
 
     timer = setInterval(() => (time = new Date()), 1000);
-
     return () => clearInterval(timer);
   });
 
@@ -39,42 +42,84 @@
     save();
   }
 
-  function toggle() {
-    show = !show;
-  }
+  const toggle = () => (show = !show);
 
-  function handleKeydown(event) {
-    if (event.key === "n" || event.key === "N") {
+  function keydown(event) {
+    const key = event.key;
+    let lkey = key.toLowerCase();
+
+    if (lkey === "n") {
       if (event.target.tagName !== "INPUT") {
         event.preventDefault();
         toggle();
       }
     }
-    if (event.key === "Escape" && show) {
+
+    if (key === "Escape" && show) {
       show = false;
+    }
+
+    if (lkey === "f") {
+      if (event.target.tagName !== "INPUT") {
+        event.preventDefault();
+        max = !max;
+      }
+    }
+
+    if (key === "ArrowUp" || key === "ArrowDown") {
+      event.preventDefault();
+      let step = key === "ArrowUp" ? 0.1 : -0.1;
+      let body = document.body;
+
+      let OP = getComputedStyle(body).opacity;
+      OP = parseFloat(OP) + step;
+      OP = Math.min(Math.max(OP, 0.1), 1);
+
+      body.style.opacity = OP;
     }
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keydown={keydown} />
 
-<main class="main-wrapper p20 mx-a f-col">
-  <div class="time tc p20 fw7">{time.toLocaleTimeString()}</div>
+{#if max}
+  <main class="max f j-ct al-ct w-100">
+    <div class="tmax fw7">
+      {fmt.time(time)}
 
-  {#if show}
-    <Form on:add={handleAdd} />
-  {/if}
+      <div class="date">{fmt.date(time)}</div>
+    </div>
+  </main>
+{:else}
+  <main class="p20 mx-a f-col">
+    <img class="logo p-fix" shadow="3" src="/icon.svg" alt="App icon" />
 
-  <div class="grid">
-    {#each items as item, i}
-      <Card {item} index={i} on:remove={remove} />
-    {/each}
-  </div>
+    <div class="time tc p20 fw7" shadow="8">
+      {fmt.default(time)} <br />
 
-  <button class="add p-fix fw7 ptr" on:click={toggle} title="New (N)">
-    +
-  </button>
-</main>
+      <div class="date">{fmt.date(time)}</div>
+    </div>
+
+    {#if show}
+      <Form on:add={handleAdd} />
+    {/if}
+
+    <div class="grid">
+      {#each items as item, i}
+        <Card {item} index={i} on:remove={remove} />
+      {/each}
+    </div>
+
+    <button
+      class="add p-fix fw7 ptr"
+      on:click={toggle}
+      title="New (N)"
+      shadow="4"
+    >
+      +
+    </button>
+  </main>
+{/if}
 
 <style>
   main {
@@ -84,10 +129,13 @@
 
   .time {
     font-size: 12em;
-    background-color: #007bff;
-    color: #ffffff;
-    box-shadow: 8px 8px 0px #000;
-    border: 3px solid #000;
+    color: #fff;
+    background: #007bff;
+  }
+
+  .date {
+    font-size: 0.1em;
+    color: #fff8;
   }
 
   .grid {
@@ -102,20 +150,37 @@
     right: 30px;
     width: 60px;
     height: 60px;
-    background-color: #007bff;
-    color: #ffffff;
-    border: 3px solid #000;
-    box-shadow: 4px 4px 0px #000;
+    background: #007bff;
     font-size: 2.5em;
     transition: all 0.1s ease-in-out;
   }
 
   .add:hover {
-    background-color: #0056b3;
+    background: #0056b3;
   }
 
   .add:active {
     transform: translate(4px, 4px);
     box-shadow: none;
+  }
+
+  .logo {
+    top: 12px;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .max {
+    background: #000;
+    height: 100vh;
+    max-width: unset;
+    width: 100vw;
+  }
+
+  .tmax {
+    color: #fff;
+    font-size: 12em;
+    line-height: 1;
   }
 </style>

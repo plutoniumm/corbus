@@ -20,13 +20,18 @@
 <article
   class="f-col j-ct al-ct tc p-rel flow-h"
   style="background: {colors[index % 5]};"
+  shadow="8"
 >
   <div class="days fw7">
     {getDays(item.target)}
   </div>
   <div class="name fw6">{item.name}</div>
 
-  <button class="p-abs fw7 ptr p0" on:click={() => dispatch("remove", index)}>
+  <button
+    shadow="3"
+    class="p-abs fw7 ptr p0"
+    on:click={() => dispatch("remove", index)}
+  >
     ⤬
   </button>
 </article>
@@ -35,8 +40,6 @@
   article {
     color: #000;
     height: 220px;
-    border: 3px solid #000;
-    box-shadow: 8px 8px 0px #000;
   }
 
   .days {
@@ -60,11 +63,7 @@
     line-height: 1em;
     border-radius: 50%;
 
-    color: #fff;
     background-color: #f00;
-    border: 3px solid #000;
-    box-shadow: 3px 3px 0px #000;
-
     transition: all 0.1s ease-in-out;
   }
 

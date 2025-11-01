@@ -3,8 +3,8 @@
 	width="400" height="400"
 	viewBox="0 0 488 488"
 	>
-	<rect x="2%" y="2%" width="96%" height="96%" stroke="#000"
-		stroke-width="5%" fill="oklch(67% .2 260)" />
+	<rect x="1%" y="1%" width="98%" height="98%" stroke="#000"
+		stroke-width="2%" fill="oklch(67% .2 260)" />
    <path d="M351 307 254 239V122L234 122V248L340 323 351 307"
 		 fill="#000"
 		 />

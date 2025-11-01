@@ -26,7 +26,7 @@
   }
 </script>
 
-<form class="f fw p20" on:submit|preventDefault={handleSubmit}>
+<form class="f fw p20" on:submit|preventDefault={handleSubmit} shadow="8">
   <input
     class="p10 fw6"
     placeholder="Name"
@@ -34,6 +34,7 @@
     bind:this={nameInput}
     required
     autofocus
+    shadow="2"
   />
 
   <input
@@ -41,48 +42,38 @@
     placeholder="Date (YYYY-MM-DD) or Days"
     bind:value={date}
     required
+    shadow="2"
   />
 
-  <button class="submit p10 fw7 ptr" type="submit">Add</button>
+  <button shadow="4" class="p10 fw7 ptr" type="submit">Add</button>
 </form>
 
 <style>
   form {
     gap: 10px;
-    background-color: #ffffff;
-    border: 3px solid #000000;
-    box-shadow: 8px 8px 0px #000000;
+    background-color: #fff;
   }
 
   input {
     flex: 1 1 200px;
-    font-size: 1em;
-    border: 3px solid #000;
-    background-color: #fff;
   }
 
   input:focus {
     outline: none;
-    background-color: #fffde7;
+    background: #fffde7;
   }
 
-  .submit {
+  button {
     flex-basis: 150px;
-    font-size: 1em;
-
     background-color: #007bff;
-    color: #fff;
-    border: 3px solid #000;
-    box-shadow: 4px 4px 0px #000;
-
     transition: all 0.1s ease-in-out;
   }
 
-  .submit:hover {
+  button:hover {
     background-color: #0056b3;
   }
 
-  .submit:active {
+  button:active {
     transform: translate(4px, 4px);
     box-shadow: none;
   }
