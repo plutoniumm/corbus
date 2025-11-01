@@ -4,7 +4,7 @@
 	viewBox="0 0 488 488"
 	>
 	<rect x="1%" y="1%" width="98%" height="98%" stroke="#000"
-		stroke-width="2%" fill="oklch(67% .2 260)" />
+		stroke-width="2%" fill="oklch(67% 0.2 260)" />
    <path d="M351 307 254 239V122L234 122V248L340 323 351 307"
 		 fill="#000"
 		 />

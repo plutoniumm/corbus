@@ -31,7 +31,6 @@
     class="p10 fw6"
     placeholder="Name"
     bind:value={name}
-    bind:this={nameInput}
     required
     autofocus
     shadow="2"
@@ -65,12 +64,8 @@
 
   button {
     flex-basis: 150px;
-    background-color: #007bff;
+    background-color: var(--blue);
     transition: all 0.1s ease-in-out;
-  }
-
-  button:hover {
-    background-color: #0056b3;
   }
 
   button:active {

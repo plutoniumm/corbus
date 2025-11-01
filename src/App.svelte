@@ -1,10 +1,9 @@
 <script>
   import { onMount } from "svelte";
 
+  import { fmt, LS, visibility } from "./utils";
   import Card from "./card.svelte";
   import Form from "./form.svelte";
-
-  import { fmt } from "./utils";
 
   let items = [];
   let time = new Date();
@@ -13,19 +12,23 @@
   let max = false;
 
   let timer;
+  let data;
 
   onMount(() => {
-    try {
-      items = JSON.parse(localStorage.getItem("items"));
-    } catch (e) {}
+    data = LS("corbus", {
+      items: [],
+      opacity: 1,
+    });
+    items = data.items;
 
+    document.body.style.opacity = data.opacity;
     timer = setInterval(() => (time = new Date()), 1000);
     return () => clearInterval(timer);
   });
 
-  function save() {
-    localStorage.setItem("items", JSON.stringify(items));
-  }
+  const save = () => (data.items = items);
+  const toggle = () => (show = !show);
+  const byDate = (a, b) => new Date(a.target) - new Date(b.target);
 
   function handleAdd(event) {
     const item = event.detail;
@@ -41,8 +44,6 @@
     items = items;
     save();
   }
-
-  const toggle = () => (show = !show);
 
   function keydown(event) {
     const key = event.key;
@@ -69,13 +70,8 @@
     if (key === "ArrowUp" || key === "ArrowDown") {
       event.preventDefault();
       let step = key === "ArrowUp" ? 0.1 : -0.1;
-      let body = document.body;
-
-      let OP = getComputedStyle(body).opacity;
-      OP = parseFloat(OP) + step;
-      OP = Math.min(Math.max(OP, 0.1), 1);
-
-      body.style.opacity = OP;
+      let OP = visibility(step);
+      data.opacity = OP;
     }
   }
 </script>
@@ -105,7 +101,7 @@
     {/if}
 
     <div class="grid">
-      {#each items as item, i}
+      {#each items.sort(byDate) as item, i}
         <Card {item} index={i} on:remove={remove} />
       {/each}
     </div>
@@ -130,7 +126,7 @@
   .time {
     font-size: 12em;
     color: #fff;
-    background: #007bff;
+    background: var(--blue);
   }
 
   .date {
@@ -150,13 +146,9 @@
     right: 30px;
     width: 60px;
     height: 60px;
-    background: #007bff;
+    background: var(--blue);
     font-size: 2.5em;
     transition: all 0.1s ease-in-out;
-  }
-
-  .add:hover {
-    background: #0056b3;
   }
 
   .add:active {
