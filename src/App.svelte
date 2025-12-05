@@ -1,14 +1,16 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
 
   import { fmt, LS, visibility } from "./utils";
   import Card from "./card.svelte";
   import Form from "./form.svelte";
+  import Task from "./task.svelte";
 
-  let items = [];
+  $: items = [];
+  $: tasks = [];
   let time = new Date();
 
-  let show = false;
+  let show: string | Boolean = false;
   let max = false;
 
   let timer;
@@ -18,72 +20,80 @@
     data = LS("corbus", {
       items: [],
       opacity: 1,
+      tasks: [
+        {
+          time: "10m",
+          steps: ["Wake up", "Brush teeth", "Exercise", "Breakfast"],
+          statii: [false, false, false, false],
+        },
+      ],
     });
     items = data.items;
+    tasks = data.tasks;
 
     document.body.style.opacity = data.opacity;
     timer = setInterval(() => (time = new Date()), 1000);
+
     return () => clearInterval(timer);
   });
 
-  const save = () => (data.items = items);
-  const toggle = () => (show = !show);
+  const saveSync = () => (data.items = items);
+  const saveAsync = () => (data.tasks = tasks);
+  const toggle = () => (show = "sync");
+  const rapid = () => (show = "async");
   const byDate = (a, b) => new Date(a.target) - new Date(b.target);
 
-  function handleAdd(event) {
-    const item = event.detail;
-    items = [...items, item];
-    save();
+  function handleSync({ detail }) {
+    items = [...items, detail];
+    saveSync();
+    show = false;
+  }
 
+  function handleAsync({ detail }) {
+    tasks = [...tasks, detail];
+    saveAsync();
     show = false;
   }
 
   let formName = "";
   let formDate = "";
-  function edit(event) {
-    const i = event.detail;
+  function edit({ detail: i }) {
     let item = items[i];
 
     show = true;
     formName = item.name;
 
-    let date = +new Date(item.target);
-    let now = +new Date();
-    let days = Math.ceil((date - now) / (36e5 * 24));
+    let days = Math.ceil((+new Date(item.target) - +new Date()) / 864e5);
     formDate = days;
 
     items.splice(i, 1);
     items = items;
-    save();
+    saveSync();
+  }
+
+  function handleUpdate({ detail }) {
+    let { key, i } = detail;
+    // as before we can just regenerate the whole task
+    let T = tasks[key];
+    T.statii[i] = !T.statii[i];
+    tasks[key] = T;
+    tasks = tasks;
+    saveAsync();
   }
 
   function keydown(event) {
     const key = event.key;
     let lkey = key.toLowerCase();
+    let isInput =
+      event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA";
 
-    if (lkey === "n") {
-      if (event.target.tagName !== "INPUT") {
-        event.preventDefault();
-        toggle();
-      }
-    }
-
-    if (key === "Escape" && show) {
-      show = false;
-    }
-
-    if (lkey === "f") {
-      if (event.target.tagName !== "INPUT") {
-        event.preventDefault();
-        max = !max;
-      }
-    }
+    if (key === "Escape" && show) show = false;
+    if (lkey === "n" && !isInput) toggle();
+    if (lkey === "f" && !isInput) max = !max;
 
     if (key === "ArrowUp" || key === "ArrowDown") {
-      event.preventDefault();
       let step = key === "ArrowUp" ? 0.1 : -0.1;
-      let OP = visibility(step);
-      data.opacity = OP;
+      data.opacity = visibility(step);
     }
   }
 </script>
@@ -109,8 +119,26 @@
     </div>
 
     {#if show}
-      <Form on:add={handleAdd} name={formName} date={formDate} />
+      <Form
+        on:async={handleAsync}
+        on:sync={handleSync}
+        name={formName}
+        date={formDate}
+        mode={show}
+      />
     {/if}
+
+    <div class="f">
+      {#each tasks as T, key}
+        <Task
+          time={T.time}
+          {key}
+          steps={T.steps}
+          on:toggle={handleUpdate}
+          statii={T.statii}
+        />
+      {/each}
+    </div>
 
     <div class="grid">
       {#each items.sort(byDate) as item, i}
@@ -118,14 +146,10 @@
       {/each}
     </div>
 
-    <button
-      class="add p-fix fw7 ptr"
-      on:click={toggle}
-      title="New (N)"
-      shadow="4"
-    >
-      +
-    </button>
+    <div class="p-fix fw7" id="controls">
+      <button class="add ptr m5" on:click={rapid} shadow="4"> ↣ </button>
+      <button class="add ptr m5" on:click={toggle} shadow="4"> + </button>
+    </div>
   </main>
 {/if}
 
@@ -152,10 +176,13 @@
     gap: 20px;
   }
 
-  .add {
-    border-radius: 50%;
+  .p-fix {
     bottom: 30px;
     right: 30px;
+  }
+
+  .add {
+    border-radius: 50%;
     width: 60px;
     height: 60px;
     background: var(--blue);

@@ -30,15 +30,19 @@ export function visibility (dx = 0) {
 }
 
 export function LS (key, defaultValue) {
-  let value;
+  let value = {};
   try {
-    value = JSON.parse(localStorage.getItem(key));
-  } catch {
-    value = defaultValue;
-  };
-  if (value === null) {
-    value = defaultValue;
-  };
+    const stored = JSON.parse(localStorage.getItem(key));
+    if (stored && typeof stored === 'object') {
+      value = stored;
+    }
+  }
+  catch { value = {}; }
+  for (const k in defaultValue) {
+    if (!(k in value)) {
+      value[k] = defaultValue[k];
+    }
+  }
 
   return new Proxy(value, {
     set (target, prop, val) {
