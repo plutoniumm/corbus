@@ -2,8 +2,8 @@
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
-  let name = "";
-  let date = "";
+  export let name = "";
+  export let date = "";
 
   function handleSubmit() {
     let target;

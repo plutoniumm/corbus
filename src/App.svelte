@@ -38,8 +38,20 @@
     show = false;
   }
 
-  function remove(event) {
+  let formName = "";
+  let formDate = "";
+  function edit(event) {
     const i = event.detail;
+    let item = items[i];
+
+    show = true;
+    formName = item.name;
+
+    let date = +new Date(item.target);
+    let now = +new Date();
+    let days = Math.ceil((date - now) / (36e5 * 24));
+    formDate = days;
+
     items.splice(i, 1);
     items = items;
     save();
@@ -97,12 +109,12 @@
     </div>
 
     {#if show}
-      <Form on:add={handleAdd} />
+      <Form on:add={handleAdd} name={formName} date={formDate} />
     {/if}
 
     <div class="grid">
       {#each items.sort(byDate) as item, i}
-        <Card {item} index={i} on:remove={remove} />
+        <Card {item} index={i} on:edit={edit} />
       {/each}
     </div>
 

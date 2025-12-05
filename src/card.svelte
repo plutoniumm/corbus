@@ -33,17 +33,28 @@
 
   <button
     shadow="3"
-    class="p-abs fw7 ptr p0"
-    on:click={() => dispatch("remove", index)}
+    class="p-abs fw7 ptr p0 o-0"
+    on:click={() => dispatch("edit", index)}
   >
-    ⤬
+    <svg
+      viewBox="0 0 32 32"
+      width="20"
+      height="20"
+      fill="#000"
+      stroke-width="2"
+    >
+      <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z" />
+    </svg>
   </button>
 </article>
 
-<style>
+<style lang="scss">
   article {
     color: #000;
     height: 220px;
+    &:hover button {
+      opacity: 1;
+    }
   }
 
   .days {
@@ -72,7 +83,7 @@
     line-height: 1em;
     border-radius: 50%;
 
-    background-color: var(--red);
+    background-color: #fff;
     transition: all 0.1s ease-in-out;
   }
 
