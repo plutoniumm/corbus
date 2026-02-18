@@ -20,13 +20,7 @@
     data = LS("corbus", {
       items: [],
       opacity: 1,
-      tasks: [
-        {
-          time: "10m",
-          steps: ["Wake up", "Brush teeth", "Exercise", "Breakfast"],
-          statii: [false, false, false, false],
-        },
-      ],
+      tasks: [],
     });
     items = data.items;
     tasks = data.tasks;
